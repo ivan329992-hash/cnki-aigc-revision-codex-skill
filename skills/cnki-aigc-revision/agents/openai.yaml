@@ -1,0 +1,4 @@
+interface:
+  display_name: "知网 AIGC 对照修订"
+  short_description: "匹配知网报告与稿件，对照版本局部修订并核验数字、引用和技术边界"
+  default_prompt: "使用 $cnki-aigc-revision 匹配我的论文和知网报告，对照标记局部修订，保留事实与引用并另存，不预测检测分数。"

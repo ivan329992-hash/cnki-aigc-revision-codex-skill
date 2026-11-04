@@ -1,0 +1,2 @@
+# Optional: required only when reading PDF detection reports.
+PyMuPDF>=1.24,<2
