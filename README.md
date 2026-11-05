@@ -16,6 +16,9 @@
 
 将 `skills/cnki-aigc-revision` 文件夹放入用户级 `$HOME/.agents/skills/`，或当前项目的 `.agents/skills/`。目录位置与调用方式参见 [Codex官方技能文档](https://learn.chatgpt.com/docs/build-skills)。不要覆盖已有同名技能，也不要同时安装多个同名副本。
 
+也可以直接使用指令词
+ `帮我安装https://github.com/ivan329992-hash/cnki-aigc-revision-codex-skill.git这个skill`
+
 ### Windows PowerShell
 
 在一个新的工作目录中执行：
@@ -65,43 +68,6 @@ test ! -e "$HOME/.agents/skills/cnki-aigc-revision" && \
 
 如果只有报告、没有对应Word，技能会先要求补充或确认版本，不会默认取“最近修改”的文件。
 
-## 主要结构
-
-```text
-.
-├── README.md
-├── LICENSE
-├── requirements.txt
-├── docs/
-│   └── anonymized-case.md       匿名历程与不能外推的结论
-├── examples/
-│   └── synthetic-example.md     完全合成的示例，不含真实论文
-├── skills/cnki-aigc-revision/
-│   ├── SKILL.md                 Codex入口、触发条件与关键约束
-│   ├── agents/openai.yaml       Codex界面信息
-│   ├── references/
-│   │   ├── workflow.md          版本匹配、对照决策与修订流程
-│   │   └── delivery-checklist.md
-│   └── scripts/
-│       └── audit_inputs.py      只读Word/PDF核验与草稿对比
-└── tests/test_audit_inputs.py    临时生成合成输入的自动化测试
-```
-
-## 工具的使用与边界
-
-核心Word比较只依赖Python标准库，建议Python 3.10及以上。PDF文本提取还需安装 `requirements.txt` 中的PyMuPDF；不需要本项目的API密钥。
-
-```bash
-python -m pip install -r requirements.txt
-python skills/cnki-aigc-revision/scripts/audit_inputs.py inspect \
-  --docx ./private-work/draft-a.docx --report ./private-work/report-a.pdf \
-  --out ./private-work/audit-a.json
-python skills/cnki-aigc-revision/scripts/audit_inputs.py compare \
-  --base ./private-work/draft-a.docx --revised ./private-work/draft-b.docx \
-  --out ./private-work/diff-ab.json
-python -m unittest discover -s tests -v
-```
-
 输出JSON包含私有正文和本地路径，只能留在私人工作目录。工具拒绝覆盖已有输出。`inspect`会报告规范化段落匹配情况、首页指标和启发式字体颜色定位；`compare`会报告插入/删除/替换、数值与引用变化、表格及参考文献变化。
 
 这些结果**不是**AIGC分数估计、普通查重率或作者身份鉴定。规范化匹配不等于文件哈希一致；“未标记”不等于证明人类创作。扫描PDF、背景色标记、修订痕迹、内容控件、浮动文本框及复杂版式均需人工复核，短表格数值也不能脱离上下文判定匹配。脚本不修改Word；由Codex结合当前可用的文档工具另存修改稿并渲染检查。
@@ -112,7 +78,7 @@ python -m unittest discover -s tests -v
 
 后期一次按照通用提示词改写多个段落，复检反而升高；最终回到较低分版本，以两份实际报告重新划定修改范围，保留较稳定的后文，参考摘要的标记变化，修正重复字、数据总量歧义及持续标记区域的表述，再完成证据和排版核验。最终送检前仍存在少量人工修改。旧版说明只概括了最后三个节点，现已补齐前期报告记录。
 
-最终报告低于当次20%的目标，但这是**一个非受控案例**，不能证明某条改写规则导致了下降，也不能保证其他论文或平台获得相同结果。详细过程见 [匿名案例](docs/anonymized-case.md)。
+最终报告低于当次20%的目标，详细过程见 [匿名案例](docs/anonymized-case.md)。
 
 ## 隐私和发布
 
@@ -122,6 +88,5 @@ python -m unittest discover -s tests -v
 
 ## 许可与说明
 
-MIT License。项目为独立工作流，不隶属于知网或OpenAI，不代表两者对其效果的认可。
+MIT License。
 
-曾参考通用改写项目的思路，但本仓库未复制其代码、提示词或案例，也不采用未经验证的检测算法解释。实际有用的经验是版本可追溯、局部修订、证据保护及诚实验收，而非“万能降分指令”。
